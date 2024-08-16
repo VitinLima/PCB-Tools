@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Exec=sh -c '/home/vitinho/miniconda3/condabin/conda run -n flatcam-env python ~/Programs/flatcam/flatcam.py'
+Name=FlatCam
+Icon=/home/vitinho/Programs/flatcam/assets/resources/flatcam_icon128.png
