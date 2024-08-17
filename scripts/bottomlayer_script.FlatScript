@@ -6,12 +6,15 @@
 # Commands list:
 # Type >help< followed by Run Code for a list of Tcl Commands (displayed in Tcl Shell).
 
-set scale 0.9856
-set rot 1.1425
-set trans_x 0.49328
-set trans_y 1.6637
+set scale 1
+set rot 0
+set trans_x 0
+set trans_y 0
 
-set job_x 85
+set fix1 -5.0
+set fix2 61.0
+
+set job_x [ expr { ( $fix2 + $fix1 )} ]
 
 set transform_args [ list $job_x $rot $trans_x $trans_y $scale ]
 
@@ -27,14 +30,14 @@ mirror $object_name -axis X -origin "origin"
 offset $object_name -x [ lindex $transform_args 0 ]
 rotate $object_name [ lindex $transform_args 1 ]
 offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 3 ]
-scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
+# scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
 }
 
-set object_name "Gerber_BottomLayer.GBL"
+set object_name "PCB1_VSSS_Copper_Signal_Bot.gbr"
 set geooutname $object_name
 append geooutname "_iso"
 del $geooutname
-isolate $object_name -dia 0.8
+isolate $object_name -dia 0.5
 apply_transformation $geooutname $transform_args
 
 apply_transformation "alignment_bot" $transform_args
@@ -42,4 +45,6 @@ apply_transformation "alignment_bot" $transform_args
 set cncoutname $object_name
 append cncoutname "_cnc"
 del $cncoutname
-cncjob $geooutname -outname $cncoutname -dia 0.8 -z_cut -0.2 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.1 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+cncjob $geooutname -outname $cncoutname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+
+plot_objects "alignment_bot" $cncoutname $geooutname
