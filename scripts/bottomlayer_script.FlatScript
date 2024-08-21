@@ -11,8 +11,10 @@ set rot 0
 set trans_x 0
 set trans_y 0
 
-set fix1 -5.0
-set fix2 61.0
+set fix1 0.0
+set fix2 85.0
+
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/"
 
 set job_x [ expr { ( $fix2 + $fix1 )} ]
 
@@ -33,18 +35,68 @@ offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 
 # scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
 }
 
-set object_name "PCB1_VSSS_Copper_Signal_Bot.gbr"
-set geooutname $object_name
-append geooutname "_iso"
-del $geooutname
-isolate $object_name -dia 0.5
-apply_transformation $geooutname $transform_args
+set botlayergbrname "Gerber_BottomLayer.GBL"
+set botlayergeoname $botlayergbrname
+append botlayergeoname "_iso"
+del $botlayergeoname
+isolate $botlayergbrname -outname $botlayergeoname -dia 0.5
+apply_transformation $botlayergeoname $transform_args
 
-apply_transformation "alignment_bot" $transform_args
+set botlayercncname $botlayergeoname
+append botlayercncname "_cnc"
+del $botlayercncname
+cncjob $botlayergeoname -outname $botlayercncname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $botlayercncname
+append filename ".cn"
+write_gcode $botlayercncname $filename
 
-set cncoutname $object_name
-append cncoutname "_cnc"
-del $cncoutname
-cncjob $geooutname -outname $cncoutname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set boardoutlinegbrname "Gerber_BoardOutlineLayer.GKO"
+set boardoutlinecutname $boardoutlinegbrname
+append boardoutlinecutname "_cutout"
+del $boardoutlinecutname
+cutout $boardoutlinegbrname -outname $boardoutlinecutname -type "rect" -dia 1.3 -margin 0.0
+apply_transformation $boardoutlinecutname $transform_args
 
-plot_objects "alignment_bot" $cncoutname $geooutname
+set boardoutlinecncname $boardoutlinecutname
+append boardoutlinecncname "_cnc"
+del $boardoutlinecncname
+cncjob $boardoutlinecutname -outname $boardoutlinecncname -dia 1.3 -z_cut -2.4 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -dpp 0.2 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $boardoutlinecncname
+append filename ".cn"
+write_gcode $boardoutlinecncname $filename
+
+set drillexcname "drill.DRL"
+del $drillexcname
+join_excellon  "Drill_PTH_Through.DRL" "Drill_PTH_Through_Via.DRL" -outname $drillexcname
+apply_transformation $drillexcname $transform_args
+
+set drillcncname $drillexcname
+append drillcncname "_cnc"
+del $drillcncname
+drillcncjob $drillexcname -outname $drillcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 60 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $drillcncname
+append filename ".cn"
+write_gcode $drillcncname $filename
+
+set alignbotexcname "alignment_bot"
+del $alignbotexcname
+new_excellon  "toolexc"
+join_excellon  "alignment" "toolexc" -outname $alignbotexcname
+del "toolexc"
+apply_transformation $alignbotexcname $transform_args
+
+set alignbotcncname $alignbotexcname
+append alignbotcncname "_cnc"
+del $alignbotcncname
+drillcncjob $alignbotexcname -outname $alignbotcncname -drilled_dias "all" -drillz 0.0 -travelz 2.0 -feedrate_z 60 -spindlespeed 0 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $alignbotcncname
+append filename ".cn"
+write_gcode $alignbotcncname $filename
+
+plot_objects $botlayergeoname,$boardoutlinecutname,$alignbotexcname,$drillexcname -plot_status 0
+plot_objects $alignbotcncname,$drillcncname,$boardoutlinecncname,$botlayercncname -plot_status 0
+plot_objects $alignbotcncname,$drillcncname,$boardoutlinecncname,$botlayercncname -plot_status 1
