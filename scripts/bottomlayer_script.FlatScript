@@ -14,7 +14,7 @@ set trans_y 0
 set fix1 0.0
 set fix2 85.0
 
-set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/"
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/bottom-side/"
 
 set job_x [ expr { ( $fix2 + $fix1 )} ]
 

@@ -9,7 +9,7 @@
 set fix1 (5.0,-3.0)
 set fix2 (80.0,-3.0)
 
-set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/"
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/top-side/"
 
 # set job_x [ expr { ( $fix2 + $fix1 )} ]
 
