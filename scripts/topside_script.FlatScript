@@ -49,7 +49,7 @@ set alignmentexcname "alignment"
 set alignmentcncname $alignmentexcname
 append alignmentcncname "_cnc"
 del $alignmentcncname
-drillcncjob $alignmentexcname -outname $alignmentcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 60 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+drillcncjob $alignmentexcname -outname $alignmentcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 10 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
 set filename $outputpath
 append filename $alignmentcncname
 append filename ".cn"
