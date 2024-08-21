@@ -15,6 +15,36 @@ set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps
 
 # set transform_args [ list $job_x $rot $trans_x $trans_y $scale ]
 
+set toplayergbrname "Gerber_TopLayer.GTL"
+set toplayergeoname $toplayergbrname
+append toplayergeoname "_iso"
+del $toplayergeoname
+set toplayercncname $toplayergeoname
+append toplayercncname "_cnc"
+del $toplayercncname
+set toplayercncfilename $outputpath
+append toplayercncfilename $toplayercncname
+append toplayercncfilename ".cn"
+
+set alignmentexcname "alignment"
+set alignmentcncname $alignmentexcname
+append alignmentcncname "_cnc"
+del $alignmentcncname
+set alignmentcncfilename $outputpath
+append alignmentcncfilename $alignmentcncname
+append alignmentcncfilename ".cn"
+
+set fixationexcname "fixation"
+set fixationgeoname $fixationexcname
+append fixationgeoname "_iso"
+del $fixationgeoname
+set fixationcncname $fixationgeoname
+append fixationcncname "_cnc"
+del $fixationcncname
+set fixationcncfilename $outputpath
+append fixationcncfilename $fixationcncname
+append fixationcncfilename ".cn"
+
 proc rotate { object angle { origin "origin" } } {
 puts $angle
 set factor [ expr { cos ( $angle * 3.14159265 / 180.0 ) } ]
@@ -30,45 +60,18 @@ offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 
 # scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
 }
 
-set toplayergbrname "Gerber_TopLayer.GTL"
-set toplayergeoname $toplayergbrname
-append toplayergeoname "_iso"
-del $toplayergeoname
 isolate $toplayergbrname -outname $toplayergeoname -dia 0.5
 
-set toplayercncname $toplayergeoname
-append toplayercncname "_cnc"
-del $toplayercncname
 cncjob $toplayergeoname -outname $toplayercncname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
-set filename $outputpath
-append filename $toplayercncname
-append filename ".cn"
-write_gcode $toplayercncname $filename
+write_gcode $toplayercncname $toplayercncfilename
 
-set alignmentexcname "alignment"
-set alignmentcncname $alignmentexcname
-append alignmentcncname "_cnc"
-del $alignmentcncname
 drillcncjob $alignmentexcname -outname $alignmentcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 10 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
-set filename $outputpath
-append filename $alignmentcncname
-append filename ".cn"
 write_gcode $alignmentcncname $filename
 
-set fixationexcname "fixation"
-set fixationgeoname $fixationexcname
-append fixationgeoname "_iso"
-del $fixationgeoname
 milldrills $fixationexcname -outname $fixationgeoname -tooldia 1.3 -milled_dias "all"
 
-set fixationcncname $fixationgeoname
-append fixationcncname "_cnc"
-del $fixationcncname
 cncjob $fixationgeoname -outname $fixationcncname -dia 1.3 -z_cut -2.4 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.2 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
-set filename $outputpath
-append filename $fixationcncname
-append filename ".cn"
-write_gcode $fixationcncname $filename
+write_gcode $fixationcncname $fixationcncfilename
 
 plot_objects $toplayergeoname,$fixationgeoname -plot_status 0
 plot_objects $toplayercncname,$fixationcncname,$alignmentcncname -plot_status 0
