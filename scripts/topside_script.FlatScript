@@ -66,7 +66,7 @@ cncjob $toplayergeoname -outname $toplayercncname -dia 0.5 -z_cut -0.15 -z_move 
 write_gcode $toplayercncname $toplayercncfilename
 
 drillcncjob $alignmentexcname -outname $alignmentcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 10 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
-write_gcode $alignmentcncname $filename
+write_gcode $alignmentcncname $alignmentcncfilename
 
 milldrills $fixationexcname -outname $fixationgeoname -tooldia 1.3 -milled_dias "all"
 
