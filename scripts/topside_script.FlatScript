@@ -1,0 +1,75 @@
+# CREATE A NEW TCL SCRIPT
+# TCL Tutorial is here:
+# https://www.tcl.tk/man/tcl8.5/tutorial/tcltutorial.html
+
+
+# Commands list:
+# Type >help< followed by Run Code for a list of Tcl Commands (displayed in Tcl Shell).
+
+set fix1 (5.0,-3.0)
+set fix2 (80.0,-3.0)
+
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/"
+
+# set job_x [ expr { ( $fix2 + $fix1 )} ]
+
+# set transform_args [ list $job_x $rot $trans_x $trans_y $scale ]
+
+proc rotate { object angle { origin "origin" } } {
+puts $angle
+set factor [ expr { cos ( $angle * 3.14159265 / 180.0 ) } ]
+skew $object -x $angle -y -$angle
+scale $object -factor $factor  -origin $origin
+}
+
+proc apply_transformation { object_name transform_args} { 
+mirror $object_name -axis X -origin "origin"
+offset $object_name -x [ lindex $transform_args 0 ]
+rotate $object_name [ lindex $transform_args 1 ]
+offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 3 ]
+# scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
+}
+
+set toplayergbrname "Gerber_TopLayer.GTL"
+set toplayergeoname $toplayergbrname
+append toplayergeoname "_iso"
+del $toplayergeoname
+isolate $toplayergbrname -outname $toplayergeoname -dia 0.5
+
+set toplayercncname $toplayergeoname
+append toplayercncname "_cnc"
+del $toplayercncname
+cncjob $toplayergeoname -outname $toplayercncname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $toplayercncname
+append filename ".cn"
+write_gcode $toplayercncname $filename
+
+set alignmentexcname "alignment"
+set alignmentcncname $alignmentexcname
+append alignmentcncname "_cnc"
+del $alignmentcncname
+drillcncjob $alignmentexcname -outname $alignmentcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 60 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $alignmentcncname
+append filename ".cn"
+write_gcode $alignmentcncname $filename
+
+set fixationexcname "fixation"
+set fixationgeoname $fixationexcname
+append fixationgeoname "_iso"
+del $fixationgeoname
+milldrills $fixationexcname -outname $fixationgeoname -tooldia 1.3 -milled_dias "all"
+
+set fixationcncname $fixationgeoname
+append fixationcncname "_cnc"
+del $fixationcncname
+cncjob $fixationgeoname -outname $fixationcncname -dia 1.3 -z_cut -2.4 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.2 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+set filename $outputpath
+append filename $fixationcncname
+append filename ".cn"
+write_gcode $fixationcncname $filename
+
+plot_objects $toplayergeoname,$fixationgeoname -plot_status 0
+plot_objects $toplayercncname,$fixationcncname,$alignmentcncname -plot_status 0
+plot_objects $toplayercncname,$fixationcncname,$alignmentcncname -plot_status 1
