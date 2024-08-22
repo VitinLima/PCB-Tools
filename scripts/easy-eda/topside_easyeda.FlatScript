@@ -26,7 +26,7 @@ set toplayercncfilename $outputpath
 append toplayercncfilename $toplayercncname
 append toplayercncfilename ".cn"
 
-set alignmentexcname "alignment"
+set alignmentexcname "Alignment Drills"
 set alignmentcncname $alignmentexcname
 append alignmentcncname "_cnc"
 del $alignmentcncname
@@ -34,7 +34,7 @@ set alignmentcncfilename $outputpath
 append alignmentcncfilename $alignmentcncname
 append alignmentcncfilename ".cn"
 
-set fixationexcname "fixation"
+set fixationexcname "Fixation Drills"
 set fixationgeoname $fixationexcname
 append fixationgeoname "_iso"
 del $fixationgeoname

@@ -94,7 +94,7 @@ drillcncjob $drillexcname -outname $drillcncname -drilled_dias "all" -drillz -2.
 write_gcode $drillcncname $drillcncfilename
 
 new_excellon  "toolexc"
-join_excellon  "alignment" "toolexc" -outname $alignbotexcname
+join_excellon  "Alignment Drills" "toolexc" -outname $alignbotexcname
 del "toolexc"
 apply_transformation $alignbotexcname $transform_args
 
