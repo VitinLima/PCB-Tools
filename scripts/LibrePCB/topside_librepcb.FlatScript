@@ -9,13 +9,13 @@
 set fix1 (5.0,-3.0)
 set fix2 (80.0,-3.0)
 
-set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/top-side/"
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/can2usb/output/gcodes/top-side/"
 
 # set job_x [ expr { ( $fix2 + $fix1 )} ]
 
 # set transform_args [ list $job_x $rot $trans_x $trans_y $scale ]
 
-set toplayergbrname "Gerber_TopLayer.GTL"
+set toplayergbrname "can2usb_COPPER-TOP.gbr"
 set toplayergeoname $toplayergbrname
 append toplayergeoname "_iso"
 del $toplayergeoname
@@ -26,7 +26,7 @@ set toplayercncfilename $outputpath
 append toplayercncfilename $toplayercncname
 append toplayercncfilename ".cn"
 
-set alignmentexcname "alignment"
+set alignmentexcname "Alignment Drills"
 set alignmentcncname $alignmentexcname
 append alignmentcncname "_cnc"
 del $alignmentcncname
@@ -34,7 +34,7 @@ set alignmentcncfilename $outputpath
 append alignmentcncfilename $alignmentcncname
 append alignmentcncfilename ".cn"
 
-set fixationexcname "fixation"
+set fixationexcname "Fixation Drills"
 set fixationgeoname $fixationexcname
 append fixationgeoname "_iso"
 del $fixationgeoname
@@ -60,9 +60,9 @@ offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 
 # scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
 }
 
-isolate $toplayergbrname -outname $toplayergeoname -dia 0.5
+isolate $toplayergbrname -outname $toplayergeoname -dia 0.1
 
-cncjob $toplayergeoname -outname $toplayercncname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+cncjob $toplayergeoname -outname $toplayercncname -dia 0.1 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
 write_gcode $toplayercncname $toplayercncfilename
 
 drillcncjob $alignmentexcname -outname $alignmentcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 10 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0

@@ -7,7 +7,7 @@
 # Type >help< followed by Run Code for a list of Tcl Commands (displayed in Tcl Shell).
 
 set scale 1
-set rot 0
+set rot 45
 set trans_x 0
 set trans_y 0
 

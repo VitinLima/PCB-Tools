@@ -7,20 +7,20 @@
 # Type >help< followed by Run Code for a list of Tcl Commands (displayed in Tcl Shell).
 
 set scale 1
-set rot 0
+set rot 45
 set trans_x 0
 set trans_y 0
 
 set fix1 0.0
 set fix2 85.0
 
-set outputpath "/home/vitinho/fabrication-cnc/pcbs/Gerber_Ps2-USB-Adapter_PCB_Ps2-USB-Adapter_2024-08-11/gcodes/bottom-side/"
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/can2usb/output/gcodes/bottom-side/"
 
 set job_x [ expr { ( $fix2 + $fix1 )} ]
 
 set transform_args [ list $job_x $rot $trans_x $trans_y $scale ]
 
-set botlayergbrname "Gerber_BottomLayer.GBL"
+set botlayergbrname "can2usb_COPPER-BOTTOM.gbr"
 set botlayergeoname $botlayergbrname
 append botlayergeoname "_iso"
 del $botlayergeoname
@@ -31,7 +31,7 @@ set botlayercncfilename $outputpath
 append botlayercncfilename $botlayercncname
 append botlayercncfilename ".cn"
 
-set boardoutlinegbrname "Gerber_BoardOutlineLayer.GKO"
+set boardoutlinegbrname "can2usb_OUTLINES.gbr"
 set boardoutlinecutname $boardoutlinegbrname
 append boardoutlinecutname "_cutout"
 del $boardoutlinecutname
@@ -51,7 +51,7 @@ set drillcncfilename $outputpath
 append drillcncfilename $drillcncname
 append drillcncfilename ".cn"
 
-set alignbotexcname "alignment_bot"
+set alignbotexcname "Alignment bottom Drills"
 del $alignbotexcname
 set alignbotcncname $alignbotexcname
 append alignbotcncname "_cnc"
@@ -87,7 +87,7 @@ apply_transformation $boardoutlinecutname $transform_args
 cncjob $boardoutlinecutname -outname $boardoutlinecncname -dia 1.3 -z_cut -2.4 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -dpp 0.2 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
 write_gcode $boardoutlinecncname $boardoutlinecncfilename
 
-join_excellon  "Drill_PTH_Through.DRL" "Drill_PTH_Through_Via.DRL" -outname $drillexcname
+join_excellon  "can2usb_DRILLS-PTH.drl" "can2usb_DRILLS-NPTH.drl" -outname $drillexcname
 apply_transformation $drillexcname $transform_args
 
 drillcncjob $drillexcname -outname $drillcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 60 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
