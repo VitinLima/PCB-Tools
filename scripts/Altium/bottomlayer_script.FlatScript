@@ -31,6 +31,14 @@ set botlayercncfilename $outputpath
 append botlayercncfilename $botlayercncname
 append botlayercncfilename ".nc"
 
+set botlayercheckgbrname "PCB1_VSSS__Check_Copper_Signal_Bot.GBL"
+set botlayercheckcncname $botlayercheckgbrname
+append botlayercheckcncname "_cnc"
+del $botlayercheckcncname
+set botlayercnccheckfilename $outputpath
+append botlayercheckcncfilename $botlayercheckcncname
+append botlayercheckcncfilename ".nc"
+
 set boardoutlinegbrname "PCB1_VSSS_Profile.gbr"
 set boardoutlinecutname $boardoutlinegbrname
 append boardoutlinecutname "_cutout"
@@ -78,6 +86,8 @@ scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
 isolate $botlayergbrname -outname $botlayergeoname -dia 0.5
 apply_transformation $botlayergeoname $transform_args
 
+cncjob $botlayergeoname -outname $botlayercheckcncname -dia 0.1 -z_cut -0.0 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+write_gcode $botlayercheckcncname $botlayercheckcncfilename
 cncjob $botlayergeoname -outname $botlayercncname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
 write_gcode $botlayercncname $botlayercncfilename
 
