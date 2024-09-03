@@ -1,0 +1,107 @@
+# CREATE A NEW TCL SCRIPT
+# TCL Tutorial is here:
+# https://www.tcl.tk/man/tcl8.5/tutorial/tcltutorial.html
+
+
+# Commands list:
+# Type >help< followed by Run Code for a list of Tcl Commands (displayed in Tcl Shell).
+
+set scale 0.98678
+set rot -0.14258
+set trans_x 19.5661
+set trans_y 0.5092
+
+set fix1 -5.0
+set fix2 61.0
+
+set outputpath "/home/vitinho/fabrication-cnc/pcbs/pcb_vsss/gcodes/bottom-side/"
+
+set job_x [ expr { ( $fix2 + $fix1 )} ]
+
+set transform_args [ list $job_x $rot $trans_x $trans_y $scale ]
+
+set botlayergbrname "PCB1_VSSS_Copper_Signal_Bot.gbr"
+set botlayergeoname $botlayergbrname
+append botlayergeoname "_iso"
+del $botlayergeoname
+set botlayercncname $botlayergeoname
+append botlayercncname "_cnc"
+del $botlayercncname
+set botlayercncfilename $outputpath
+append botlayercncfilename $botlayercncname
+append botlayercncfilename ".nc"
+
+set boardoutlinegbrname "PCB1_VSSS_Profile.gbr"
+set boardoutlinecutname $boardoutlinegbrname
+append boardoutlinecutname "_cutout"
+del $boardoutlinecutname
+set boardoutlinecncname $boardoutlinecutname
+append boardoutlinecncname "_cnc"
+del $boardoutlinecncname
+set boardoutlinecncfilename $outputpath
+append boardoutlinecncfilename $boardoutlinecncname
+append boardoutlinecncfilename ".nc"
+
+set drillexcname "drill bot"
+del $drillexcname
+set drillcncname $drillexcname
+append drillcncname "_cnc"
+del $drillcncname
+set drillcncfilename $outputpath
+append drillcncfilename $drillcncname
+append drillcncfilename ".nc"
+
+set alignbotexcname "Alignment bot Drills"
+del $alignbotexcname
+set alignbotcncname $alignbotexcname
+append alignbotcncname "_cnc"
+del $alignbotcncname
+set alignbotcncfilename $outputpath
+append alignbotcncfilename $alignbotcncname
+append alignbotcncfilename ".nc"
+
+proc rotate { object angle { origin "origin" } } {
+puts $angle
+set factor [ expr { cos ( $angle * 3.14159265 / 180.0 ) } ]
+skew $object -x $angle -y -$angle
+scale $object -factor $factor  -origin $origin
+}
+
+proc apply_transformation { object_name transform_args} { 
+mirror $object_name -axis X -origin "origin"
+offset $object_name -x [ lindex $transform_args 0 ]
+rotate $object_name [ lindex $transform_args 1 ]
+offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 3 ]
+# scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
+}
+
+isolate $botlayergbrname -outname $botlayergeoname -dia 0.5
+apply_transformation $botlayergeoname $transform_args
+
+cncjob $botlayergeoname -outname $botlayercncname -dia 0.5 -z_cut -0.15 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -extracut_length 1.0 -dpp 0.05 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+write_gcode $botlayercncname $botlayercncfilename
+
+cutout $boardoutlinegbrname -outname $boardoutlinecutname -type "rect" -dia 1.3 -margin 0.0
+apply_transformation $boardoutlinecutname $transform_args
+
+cncjob $boardoutlinecutname -outname $boardoutlinecncname -dia 1.3 -z_cut -2.4 -z_move 2.0 -feedrate 120.0 -feedrate_z 60 -dpp 0.2 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+write_gcode $boardoutlinecncname $boardoutlinecncfilename
+
+new_excellon  "toolexc"
+join_excellon  "drills" "toolexc" -outname $drillexcname
+# join_excellon  "Drill_PTH_Through.DRL" "Drill_PTH_Through_Via.DRL" -outname $drillexcname
+apply_transformation $drillexcname $transform_args
+
+drillcncjob $drillexcname -outname $drillcncname -drilled_dias "all" -drillz -2.4 -travelz 2.0 -feedrate_z 60 -spindlespeed 3000 -toolchangez 15.0 -endz 15.0
+write_gcode $drillcncname $drillcncfilename
+
+join_excellon  "Alignment Drills" "toolexc" -outname $alignbotexcname
+del "toolexc"
+apply_transformation $alignbotexcname $transform_args
+
+drillcncjob $alignbotexcname -outname $alignbotcncname -drilled_dias "all" -drillz 0.0 -travelz 2.0 -feedrate_z 60 -spindlespeed 0 -toolchangez 15.0 -endz 15.0
+write_gcode $alignbotcncname $alignbotcncfilename
+
+plot_objects $botlayergeoname,$boardoutlinecutname,$alignbotexcname,$drillexcname -plot_status 0
+plot_objects $alignbotcncname,$drillcncname,$boardoutlinecncname,$botlayercncname -plot_status 0
+plot_objects $alignbotcncname,$drillcncname,$boardoutlinecncname,$botlayercncname -plot_status 1
