@@ -51,7 +51,7 @@ set drillcncfilename $outputpath
 append drillcncfilename $drillcncname
 append drillcncfilename ".nc"
 
-set alignbotexcname "Alignment bottom Drills"
+set alignbotexcname "Alignment bottom check"
 del $alignbotexcname
 set alignbotcncname $alignbotexcname
 append alignbotcncname "_cnc"
@@ -72,7 +72,7 @@ mirror $object_name -axis X -origin "origin"
 offset $object_name -x [ lindex $transform_args 0 ]
 rotate $object_name [ lindex $transform_args 1 ]
 offset $object_name -x [ lindex $transform_args 2 ] -y [ lindex $transform_args 3 ]
-# scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
+scale $object_name -factor [ lindex $transform_args 4 ] -origin "origin"
 }
 
 isolate $botlayergbrname -outname $botlayergeoname -dia 0.1
