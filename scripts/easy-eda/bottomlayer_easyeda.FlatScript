@@ -29,7 +29,7 @@ append botlayercncname "_cnc"
 del $botlayercncname
 set botlayercncfilename $outputpath
 append botlayercncfilename $botlayercncname
-append botlayercncfilename ".cn"
+append botlayercncfilename ".nc"
 
 set boardoutlinegbrname "Gerber_BoardOutlineLayer.GKO"
 set boardoutlinecutname $boardoutlinegbrname
@@ -40,7 +40,7 @@ append boardoutlinecncname "_cnc"
 del $boardoutlinecncname
 set boardoutlinecncfilename $outputpath
 append boardoutlinecncfilename $boardoutlinecncname
-append boardoutlinecncfilename ".cn"
+append boardoutlinecncfilename ".nc"
 
 set drillexcname "drill.DRL"
 del $drillexcname
@@ -49,7 +49,7 @@ append drillcncname "_cnc"
 del $drillcncname
 set drillcncfilename $outputpath
 append drillcncfilename $drillcncname
-append drillcncfilename ".cn"
+append drillcncfilename ".nc"
 
 set alignbotexcname "Alignment bot Drills"
 del $alignbotexcname
@@ -58,7 +58,7 @@ append alignbotcncname "_cnc"
 del $alignbotcncname
 set alignbotcncfilename $outputpath
 append alignbotcncfilename $alignbotcncname
-append alignbotcncfilename ".cn"
+append alignbotcncfilename ".nc"
 
 proc rotate { object angle { origin "origin" } } {
 puts $angle

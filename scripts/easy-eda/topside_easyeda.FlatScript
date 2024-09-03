@@ -24,7 +24,7 @@ append toplayercncname "_cnc"
 del $toplayercncname
 set toplayercncfilename $outputpath
 append toplayercncfilename $toplayercncname
-append toplayercncfilename ".cn"
+append toplayercncfilename ".nc"
 
 set alignmentexcname "Alignment Drills"
 set alignmentcncname $alignmentexcname
@@ -32,7 +32,7 @@ append alignmentcncname "_cnc"
 del $alignmentcncname
 set alignmentcncfilename $outputpath
 append alignmentcncfilename $alignmentcncname
-append alignmentcncfilename ".cn"
+append alignmentcncfilename ".nc"
 
 set fixationexcname "Fixation Drills"
 set fixationgeoname $fixationexcname
@@ -43,7 +43,7 @@ append fixationcncname "_cnc"
 del $fixationcncname
 set fixationcncfilename $outputpath
 append fixationcncfilename $fixationcncname
-append fixationcncfilename ".cn"
+append fixationcncfilename ".nc"
 
 proc rotate { object angle { origin "origin" } } {
 puts $angle
